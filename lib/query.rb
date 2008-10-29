@@ -32,8 +32,15 @@ module Trac
       end
       uri = URI.parse(url)
       use_ssl = (uri.scheme == 'https') ? true : false
-      puts uri.to_s
-      @connection = XMLRPC::Client.new2(url)
+      @connection = XMLRPC::Client.new(uri.host,
+                                       uri.path,
+                                       uri.port,
+                                       nil,
+                                       nil,
+                                       user,
+                                       pass,
+                                       use_ssl,
+                                       nil)
     end
     
     def query command, *args
