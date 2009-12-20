@@ -51,8 +51,7 @@ module Trac
         return @connection.call(command,*args)
       rescue => e
         if e.message =~ /HTTP-Error/
-          errorcode = e.message.sub 'HTTP-Error: ',''
-          raise TracException.new(errorcode,@host,@port,@path,command,args)
+          raise TracException.new(e.message,@host,@port,@path,command,args)
         else
           raise
         end
