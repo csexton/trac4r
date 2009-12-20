@@ -1,6 +1,6 @@
 spec = Gem::Specification.new do |s| 
   s.name = 'trac4r'
-  s.version = '1.0.0'
+  s.version = '1.1.0'
   s.author = 'Niklas Cathro'
   s.homepage = 'http://github.com/csexton/trac4r/'
   s.platform = Gem::Platform::RUBY
