@@ -32,9 +32,12 @@ module Trac
       end
       uri = URI.parse(url)
       use_ssl = (uri.scheme == 'https') ? true : false
-      @connection = XMLRPC::Client.new(uri.host,
-                                       uri.path,
-                                       uri.port,
+      @host = uri.host
+      @path = uri.path
+      @port = uri.port
+      @connection = XMLRPC::Client.new(@host,
+                                       @path,
+                                       @port,
                                        nil,
                                        nil,
                                        user,
@@ -49,7 +52,7 @@ module Trac
       rescue => e
         if e.message =~ /HTTP-Error/
           errorcode = e.message.sub 'HTTP-Error: ',''
-          raise TracException, "#{errorcode}"
+          raise TracException, "#{errorcode} when trying URL #{@host}:#{@port}#{@path} and method #{command}(#{args.join('.')})"
         else
           raise
         end
