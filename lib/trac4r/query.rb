@@ -52,7 +52,7 @@ module Trac
       rescue => e
         if e.message =~ /HTTP-Error/
           errorcode = e.message.sub 'HTTP-Error: ',''
-          raise TracException, "#{errorcode} when trying URL #{@host}:#{@port}#{@path} and method #{command}(#{args.join('.')})"
+          raise TracException.new(errorcode,@host,@port,@path,command,args)
         else
           raise
         end
