@@ -1,5 +1,7 @@
 module Trac
   # This class represents a ticket as it is retrieved from the database
+  # Custom fields are detected and available via runtime-dispatched methods.  
+  # See +method_missing+
   class Ticket
     attr_accessor(:id,          # Integer
                   :severity,    # String
@@ -28,6 +30,19 @@ module Trac
         return false if instance_variable_get(v.to_sym).nil?
       end
       return true
+    end
+
+    # If a method call has no args and matches an instance variable,
+    # we return its value.  e.g. if our tickets have a custom field
+    # called +work_units+, then +some_ticket.work_units+ will
+    # retrieve that value.  This currently only allows retrieval and
+    # not updating the value.
+    def method_missing(sym,*args)
+      if args.size == 0 && instance_variables.include?("@" + sym.to_s)
+        instance_eval("@" + sym.to_s)
+      else
+        super.method_missing(sym,args)
+      end
     end
     
     # loads a ticket from the XMLRPC response
