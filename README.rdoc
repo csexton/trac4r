@@ -28,3 +28,8 @@ This wraps the Trac XML-RPC plugin.
     trac = Trac.new("http://www.example.com/trac/project/xmlrpc","username","password")
     trac.tickets.list # get all tickets
     trac.tickets.get 2334 # Get ticket #2334
+
+== More Info
+
+* {RDoc}[http://davetron5000.github.com/trac4r]
+* {Source}[http://www.github.com/davetron5000/trac4r]
