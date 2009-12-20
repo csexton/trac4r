@@ -1,0 +1,5 @@
+*.sw?
+pkg
+coverage
+html
+api.yaml

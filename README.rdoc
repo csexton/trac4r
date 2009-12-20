@@ -1,0 +1,30 @@
+trac4r: Ruby wrapper for the Trac XML-RPC API
+=============================================
+
+Author::   Niklas Cathor
+License:: See LICENSE in source distribution
+
+For more information on the Trac XML-RPC see the {plugin's page on trac-hacks.com}[http://trac-hacks.org/wiki/XmlRpcPlugin#UsingfromRuby]
+
+Thanks to the original author, Niklas Cathor, who has done most of the work.
+
+== Install
+
+    # Only if you haven't set up gemcutter yet
+    sudo gem install gemcutter
+    sudo gem tumble
+
+    # Once Gemcutter is setup
+    sudo gem install trac4r
+
+== Overview
+
+This wraps the Trac XML-RPC plugin.
+
+    require 'rubygems'
+    require 'trac4r'
+
+    # Note that you need to point to the XMLRPC root and not the root of the trac web interface
+    trac = Trac.new("http://www.example.com/trac/project/xmlrpc","username","password")
+    trac.tickets.list # get all tickets
+    trac.tickets.get 2334 # Get ticket #2334

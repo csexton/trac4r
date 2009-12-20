@@ -24,11 +24,11 @@ DON'T USE IT IF YOU'RE AN ASSHOLE!
 
 filedir = File.dirname(__FILE__)
 
-require "#{filedir}/lib/query"
-require "#{filedir}/lib/tickets"
-require "#{filedir}/lib/ticket"
-require "#{filedir}/lib/wiki"
-require "#{filedir}/lib/error"
+require "trac4r/query"
+require "trac4r/tickets"
+require "trac4r/ticket"
+require "trac4r/wiki"
+require "trac4r/error"
 
 
 # This module wraps the XMLRPC interface of
