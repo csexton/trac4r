@@ -34,15 +34,25 @@ module Trac
     #   list :include_closed => false
     # to only get open tickets.
     def list options={ }
-      include_closed = options[:include_closed] || true
-      tickets = @trac.query("ticket.query","status!=closed")
-      tickets += @trac.query("ticket.query","status=closed") if include_closed
+      include_closed = true
+      include_closed = options[:include_closed] if !options[:include_closed].nil?
+      tickets = query(:status => "!closed")
+      tickets += query(:status => "closed") if include_closed
       return tickets
     end
-    
+
+    # Run an arbitrary ticket query
+    # [+args+] a hash of options, each should use a symbol or string
+    # as the key and a symbol/string or array of symbols/strings as the value.  If the
+    # value starts with a +!+, it will be treated as a not equal.
+    # Multiple values mean "or", as in any value may match
+    def query(args)
+      @trac.query("ticket.query",args_to_trac_args(args))
+    end
+
     # like `list', but only gets closed tickets
     def list_closed
-      @trac.query("ticket.query","status=closed")
+      query(:status => "closed")
     end
   
     # returns all tickets (not just the ids) in a hash
@@ -155,5 +165,17 @@ module Trac
       end
       return @settings
     end
+
+    private 
+
+    def args_to_trac_args(args)
+      trac_args = []
+      args.each do |key,value|
+        value = [value].flatten.map{ |x| x.to_s }.join('|')
+        trac_args << key.to_s + (value =~ /^!/ ? "!=#{value[1..-1]}" : "=#{value}")
+      end
+      trac_args.join('&')
+    end
+    
   end
 end
