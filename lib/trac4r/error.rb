@@ -39,9 +39,9 @@ module Trac
       elsif @http_status == '401'
         "Your username/password didn't authenticate, check your configuration"
       elsif @http_status
-        "#{@http_message} (#{@http_status}) when trying URL http://#{@host}:#{@port}#{@path} and method #{@method}(#{@args.join('.')})"
+        "#{@http_message} (#{@http_status}) when trying URL #{url} and method #{@method}(#{@args.join('.')})"
       else
-        "#{@http_message} when trying URL http://#{@host}:#{@port}#{@path} and method #{@method}(#{@args.join('.')})"
+        "#{@http_message} when trying URL #{url} and method #{@method}(#{@args.join('.')})"
       end
     end
 
