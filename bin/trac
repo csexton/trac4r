@@ -1,0 +1,134 @@
+#!/usr/bin/ruby
+$: << File.expand_path(File.dirname(__FILE__) + '/../lib')
+require 'rubygems'
+require 'gli'
+require 'trac4r'
+require 'rainbow'
+
+include GLI
+
+$opener = RUBY_PLATFORM =~ /^universal-darwin/ ? 'open' : nil
+
+desc 'Command to use to open URLs'
+default_value $opener
+flag [:o,:open]
+
+desc 'URL to trac'
+flag [:url]
+
+desc 'Your username'
+flag [:u,:user]
+
+desc 'Your password'
+flag [:p,:password]
+
+desc 'Open the ticket or wiki page'
+arg_name 'the id of the ticket or name of wiki page'
+command :open do |c|
+  c.action do |global_options,options,args|
+    raise "You must supply a ticket ID or WikiName" if args.empty?
+    id = args[0]
+    if id =~ /^\d+$/
+      system "#{global_options[:o]} #{$url}/ticket/#{id}"
+    else
+      system "#{global_options[:o]} #{$url}/wiki/#{args.map{ |x| x[0..0].upcase + x[1..-1]}.join('')}"
+    end
+  end
+end
+
+desc 'Lists tickets you own'
+arg_name 'ticket ids (blank for all)'
+command [:tickets,:ls] do |c|
+  c.desc 'Show tickets accepted'
+  c.switch [:a,:accepted]
+
+  c.desc 'Component'
+  c.flag [:c,:component]
+
+  c.desc 'Show full description'
+  c.switch [:l,:description]
+
+  c.action do |global_options,options,args|
+    opts = { :owner => 'dave.copeland' }
+    if options[:a]
+      opts[:status] = :accepted
+    else
+      opts[:status] = ["!closed","testing"]
+    end
+    opts[:component] = options[:c] if options[:c]
+    ids = args
+    ids = $trac.tickets.query(opts) if ids.empty?
+    tickets = ids.map{ |id| $trac.tickets.get(id) } 
+    tickets.sort{ |a,b| a.summary.downcase <=> b.summary.downcase }.each do |ticket|
+      printf "%14s - %17s - %s\n", ("#" + ticket.id.to_s.foreground(:green)),ticket.status.foreground(:cyan),ticket.summary.underline
+      if (options[:l])
+        description = bold(ticket.description)
+        description = italic(description)
+        description = code(description)
+        puts 
+        puts "#{description}"
+        puts "----"
+      else
+        id_color = ticket.id.to_s.foreground(:green)
+      end
+    end
+  end
+end
+
+def bold(string)
+  desc = string.split("'''")
+  description = ""
+  bold = false
+  desc.each do |part|
+    description << part.bright.foreground(:cyan) if bold
+    description << part.reset if !bold
+    bold = !bold
+  end
+  description
+end
+
+def italic(string)
+  desc = string.split("''")
+  description = ""
+  bold = false
+  desc.each do |part|
+    description << part.italic.foreground(:magenta) if bold
+    description << part.reset if !bold
+    bold = !bold
+  end
+  description
+end
+
+def code(string)
+  desc = string.split("`")
+  description = ""
+  bold = false
+  desc.each do |part|
+    description << part.bright.foreground(:green) if bold
+    description << part.reset if !bold
+    bold = !bold
+  end
+  description
+end
+
+pre do |global,command,options,args|
+  raise "You must specify a URL" if !global[:url]
+  $url = global[:url]
+  $trac = Trac.new($url,global[:u],global[:p])
+  # Pre logic here
+  # Return true to proceed; false to abourt and not call the
+  # chosen command
+  true
+end
+
+post do |global,command,options,args|
+  # Post logic here
+end
+
+on_error do |exception|
+  # Error logic here
+  # return false to skip default error handling
+  true
+end
+
+GLI.run(ARGV)
