@@ -44,6 +44,11 @@ module Trac
       @trac.query('wiki.getPageHTML',name)
     end
     
+    # returns a whole page in HTML
+    def get_info name
+      @trac.query('wiki.getPageInfo',name)
+    end
+    
     # returns a whole page in raw format
     def get_raw name
       @trac.query('wiki.getPage',name)
