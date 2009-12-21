@@ -64,12 +64,18 @@ module Trac
     def initialize url,user,pass
       @user = user
       @pass = pass
-      if url.split('/').last != 'xmlrpc'
-        url = url+'/xmlrpc'
+      @url = url
+      @url.gsub!(/\/$/,'')
+      if @url.split('/').last != 'xmlrpc'
+        @url = url+'/xmlrpc'
       end
-       @connection = Query.new(url,user,pass)
+      @connection = Query.new(@url,@user,@pass)
       @wiki = Wiki.new(@connection)
       @tickets = Tickets.new(@connection)
+    end
+
+    def query(command,*args)
+      @connection.query(command,*args)
     end
     
     def api_version
