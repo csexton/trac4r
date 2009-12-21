@@ -36,10 +36,17 @@ module Trac
     # we return its value.  e.g. if our tickets have a custom field
     # called +work_units+, then +some_ticket.work_units+ will
     # retrieve that value.  This currently only allows retrieval and
-    # not updating the value.
+    # not updating the value.  Also note that you can retrieve a custom
+    # field using "!" and this will silently return nil if the instance
+    # variable didn't exist.  This is useful if some tickets just don't
+    # have the custom field, but you don't wish to check for it
     def method_missing(sym,*args)
+      method = sym.to_s
+      method = method[0..-2] if method =~ /!$/
       if args.size == 0 && instance_variables.include?("@" + sym.to_s)
         instance_eval("@" + sym.to_s)
+      elsif method != sym.to_s
+        nil
       else
         super.method_missing(sym,args)
       end
