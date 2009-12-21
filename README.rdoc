@@ -2,6 +2,7 @@ trac4r: Ruby wrapper for the Trac XML-RPC API
 =============================================
 
 Author::   Niklas Cathor
+Author::   David Copeland
 License:: See LICENSE in source distribution
 
 For more information on the Trac XML-RPC see the {plugin's page on trac-hacks.com}[http://trac-hacks.org/wiki/XmlRpcPlugin#UsingfromRuby]
@@ -28,6 +29,21 @@ This wraps the Trac XML-RPC plugin.
     trac = Trac.new("http://www.example.com/trac/project/xmlrpc","username","password")
     trac.tickets.list # get all tickets
     trac.tickets.get 2334 # Get ticket #2334
+
+=== Tickets
+
+Trac's backbone is tickets.  The Tickets class contains many useful methods, but can also run arbitrary queries against Trac using
+a more Rubyesque syntax:
+
+    # Gets all tickets in the "Web" component with a status of either "assigned"
+    # "accepted", or "new"
+    available_web_tickets = trac.tickets.query(:component => 'Web', :status => [:assigned,:accepted,:new])
+
+    # Ticktes that are not closed
+    unclosed_tickets = trac.tickets.query(:status => "!closed")
+
+    # This is a bit wierd, the "!" in the first element means "none of these values"
+    not_closed_nor_testing = trac.tickets.query(:status => ["!closed","test"])
 
 == More Info
 
