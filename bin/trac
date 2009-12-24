@@ -4,10 +4,11 @@ require 'rubygems'
 require 'gli'
 require 'trac4r'
 require 'rainbow'
+require 'cgi'
 
 include GLI
 
-$opener = RUBY_PLATFORM =~ /^universal-darwin/ ? 'open' : nil
+$opener = RUBY_PLATFORM =~ /darwin/ ? 'open' : nil
 
 config_file '.trac4r'
 
@@ -35,6 +36,38 @@ command :open do |c|
     else
       system "#{global_options[:o]} #{$url}/wiki/#{args.map{ |x| x[0..0].upcase + x[1..-1]}.join('')}"
     end
+  end
+end
+
+desc 'Go to the new ticket web interface'
+long_desc 'Navigates your browser to the web interface, initialized with the values you provide, but does not actually create the ticket'
+arg_name 'summary for the ticket'
+command [:newticket] do |c|
+  c.desc 'component'
+  c.flag [:c,:component]
+
+  c.desc 'type'
+  c.flag [:t,:type]
+
+  c.desc 'priority'
+  c.flag [:p,:priority]
+
+  c.action do |global_options,options,args|
+    query_params = {}
+    query_params['priority'] = options[:p] if options[:p]
+    query_params['component'] = options[:c] if options[:c]
+    query_params['type'] = options[:t] if options[:t]
+    query_params['summary'] = args.join(' ')
+    query_string = ''
+    query_params.each do |key,value|
+      query_string += key
+      query_string += '='
+      query_string += CGI.escape(value)
+      query_string += '&'
+    end
+
+    url = $url.gsub(/\/xmlrpc/,'') + '/newticket?' + query_string
+    system "#{global_options[:o]} \"#{url}\""
   end
 end
 
