@@ -1,7 +1,7 @@
 spec = Gem::Specification.new do |s| 
   s.name = 'trac4r'
-  s.version = '1.1.0'
-  s.author = 'Niklas Cathro'
+  s.version = '1.2.0'
+  s.author = 'Niklas Cathro and David Copeland'
   s.homepage = 'http://github.com/csexton/trac4r/'
   s.platform = Gem::Platform::RUBY
   s.summary = 'Ruby Client Library for Trac'
@@ -19,5 +19,7 @@ lib/trac4r.rb
   s.extra_rdoc_files = ['README.rdoc']
   s.rdoc_options << '--title' << 'trac4r Trac Ruby Client' << '--main' << 'README.rdoc' << '-ri'
   s.rubyforge_project = 'trac4r'
+  s.add_dependency('rainbow', '>= 1.0.4')
+  s.add_dependency('gli', '>= 1.1.0')
 end
 

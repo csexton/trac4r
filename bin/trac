@@ -9,6 +9,8 @@ include GLI
 
 $opener = RUBY_PLATFORM =~ /^universal-darwin/ ? 'open' : nil
 
+config_file '.trac4r'
+
 desc 'Command to use to open URLs'
 default_value $opener
 flag [:o,:open]
