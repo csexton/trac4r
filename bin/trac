@@ -112,12 +112,13 @@ def code(string)
 end
 
 pre do |global,command,options,args|
-  raise "You must specify a URL" if !global[:url]
-  $url = global[:url]
-  $trac = Trac.new($url,global[:u],global[:p])
-  # Pre logic here
-  # Return true to proceed; false to abourt and not call the
-  # chosen command
+  if command.nil? || command.name == :help
+    # not creating a trac instance
+  else
+    $url = global[:url]
+    raise "You must specify a URL" if $url.nil?
+    $trac = Trac.new($url,global[:u],global[:p])
+  end
   true
 end
 
