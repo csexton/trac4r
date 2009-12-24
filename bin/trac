@@ -25,6 +25,9 @@ flag [:u,:user]
 desc 'Your password'
 flag [:p,:password]
 
+desc 'Do not colorize output'
+switch [:nocolor]
+
 desc 'Open the ticket or wiki page'
 arg_name 'the id of the ticket or name of wiki page'
 command :open do |c|
@@ -95,16 +98,21 @@ command [:tickets,:ls] do |c|
     ids = $trac.tickets.query(opts) if ids.empty?
     tickets = ids.map{ |id| $trac.tickets.get(id) } 
     tickets.sort{ |a,b| a.summary.downcase <=> b.summary.downcase }.each do |ticket|
-      printf "%14s - %17s - %s\n", ("#" + ticket.id.to_s.foreground(:green)),ticket.status.foreground(:cyan),ticket.summary.underline
+      if global_options[:nocolor]
+        printf "%5s - %8s - %s\n", ("#" + ticket.id.to_s),ticket.status,ticket.summary
+      else
+        printf "%14s - %17s - %s\n", ("#" + ticket.id.to_s.foreground(:green)),ticket.status.foreground(:cyan),ticket.summary.underline
+      end
       if (options[:l])
-        description = bold(ticket.description)
-        description = italic(description)
-        description = code(description)
+        description = ticket.description
+        if !global_options[:nocolor]
+          description = bold(description)
+          description = italic(description)
+          description = code(description)
+        end
         puts 
         puts "#{description}"
         puts "----"
-      else
-        id_color = ticket.id.to_s.foreground(:green)
       end
     end
   end
@@ -143,7 +151,27 @@ def code(string)
     description << part.reset if !bold
     bold = !bold
   end
-  description
+  in_code = false
+  coded = ''
+  description.split(/\n/).each do |line|
+    ignore = false
+    if line =~ /^\{\{\{\s*$/
+      in_code = true
+      ignore = true
+    elsif line =~ /^\}\}\}/
+      in_code = false
+      ignore = true
+    end
+    if !ignore
+      if in_code
+        coded += line.bright.foreground(:green)
+      else
+        coded += line
+      end
+    end
+    coded += "\n"
+  end
+  coded
 end
 
 pre do |global,command,options,args|
