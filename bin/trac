@@ -74,7 +74,7 @@ command [:newticket] do |c|
   end
 end
 
-desc 'Lists tickets you own'
+desc 'Lists tickets'
 arg_name 'ticket ids (blank for all)'
 command [:tickets,:ls] do |c|
   c.desc 'Show tickets accepted'
@@ -86,14 +86,28 @@ command [:tickets,:ls] do |c|
   c.desc 'Show full description'
   c.switch [:l,:description]
 
+  c.desc 'Arbitrary query (flags are included, too)'
+  c.flag [:q,:query]
+
+  c.desc 'Owner ("ME" for the -u user)'
+  c.flag [:o,:ownber]
+
   c.action do |global_options,options,args|
-    opts = { :owner => 'dave.copeland' }
-    if options[:a]
-      opts[:status] = :accepted
+    opts = {}
+
+    if options[:q]
+      raise "bad query" if options[:q] =~ /\}/
+      opts = instance_eval('{' + options[:q] + '}')
     else
-      opts[:status] = ["!closed","testing"]
+      opts[:owner] = options[:o]
+      opts[:owner] = global_options[:u] if options[:o] == "ME"
+      if options[:a]
+        opts[:status] = :accepted
+      else
+        opts[:status] = ["!closed","testing"]
+      end
+      opts[:component] = options[:c] if options[:c]
     end
-    opts[:component] = options[:c] if options[:c]
     ids = args
     ids = $trac.tickets.query(opts) if ids.empty?
     tickets = ids.map{ |id| $trac.tickets.get(id) } 
