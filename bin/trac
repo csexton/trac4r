@@ -8,12 +8,19 @@ require 'cgi'
 
 include GLI
 
-$opener = RUBY_PLATFORM =~ /darwin/ ? 'open' : nil
+OPENER_DEFAULT = RUBY_PLATFORM =~ /darwin/ ? 'open' : nil
+begin
+  # TODO: Figure out a better way to do this
+  cols = `stty -a | grep "columns;" | head -1`.split(/;/)
+  COLUMNS_DEFAULT = cols[2].gsub(' columns','')
+rescue
+  COLUMNS_DEFAULT = nil
+end
 
 config_file '.trac4r'
 
 desc 'Command to use to open URLs'
-default_value $opener
+default_value OPENER_DEFAULT
 flag [:o,:open]
 
 desc 'URL to trac'
