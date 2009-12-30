@@ -32,8 +32,13 @@ flag [:u,:user]
 desc 'Your password'
 flag [:p,:password]
 
-desc 'Do not colorize output'
-switch [:nocolor]
+desc 'Do not format output'
+long_desc 'By default, the output is formatted fo readability in the terminal.  By disabling this, the output is more "machine readable" and parsable by other scripts'
+switch [:noformat]
+
+desc 'number of columns for formatting'
+default_value COLUMNS_DEFAULT
+flag [:cols]
 
 desc 'Open the ticket or wiki page'
 arg_name 'the id of the ticket or name of wiki page'
@@ -81,6 +86,13 @@ command [:newticket] do |c|
   end
 end
 
+FORMATTING = {
+  'id' => { :color => :green, :size => 6 },
+  'status' => { :color => :cyan, :size => 9 },
+  'owner' => { :size => 17 },
+  'component' => { :size => 10, :color => :magenta },
+  'milestone' => { :size => 28, :color => :cyan },
+}
 desc 'Lists tickets'
 arg_name 'ticket ids (blank for all)'
 command [:tickets,:ls] do |c|
@@ -97,7 +109,11 @@ command [:tickets,:ls] do |c|
   c.flag [:q,:query]
 
   c.desc 'Owner ("ME" for the -u user)'
-  c.flag [:o,:ownber]
+  c.flag [:o,:owner]
+
+  c.desc 'Columns to show'
+  c.long_desc 'comma-delimited list of the column names from the tickets to show in the output'
+  c.flag [:columns]
 
   c.action do |global_options,options,args|
     opts = {}
@@ -119,14 +135,39 @@ command [:tickets,:ls] do |c|
     ids = $trac.tickets.query(opts) if ids.empty?
     tickets = ids.map{ |id| $trac.tickets.get(id) } 
     tickets.sort{ |a,b| a.summary.downcase <=> b.summary.downcase }.each do |ticket|
-      if global_options[:nocolor]
-        printf "%5s - %8s - %s\n", ("#" + ticket.id.to_s),ticket.status,ticket.summary
+      if global_options[:noformat]
+        puts [ticket.id,ticket.status,ticket.owner,ticket.summary].join("\t")
       else
-        printf "%14s - %17s - %s\n", ("#" + ticket.id.to_s.foreground(:green)),ticket.status.foreground(:cyan),ticket.summary.underline
+        columns = options[:columns]
+        columns = 'id,status,owner,summary' if !columns
+        columns = columns.split(/,/)
+        printf_string = ""
+        padding = 0
+        args = []
+        columns.each do |col|
+          if col != 'summary'
+            size = FORMATTING[col] && FORMATTING[col][:size]
+            size = 10 if !size
+            padding += size == "" ? 3 : (size.to_i + 3)
+            size += 9 if size && FORMATTING[col] && FORMATTING[col][:color]
+            printf_string += "%#{size}s - "
+            if FORMATTING[col] && FORMATTING[col][:color]
+              args << ticket.send(col.to_sym).to_s.color(FORMATTING[col][:color])
+            else
+              args << ticket.send(col.to_sym).to_s
+            end
+          end
+        end
+        printf_string.gsub!(/ - $/,'')
+        if columns.include? 'summary'
+          args << wrap(ticket.summary,padding+1,global_options[:cols])
+          printf_string += " - %s"
+        end
+        printf("#{printf_string}\n",*args)
       end
       if (options[:l])
         description = ticket.description
-        if !global_options[:nocolor]
+        if !global_options[:noformat]
           description = bold(description)
           description = italic(description)
           description = code(description)
@@ -137,6 +178,35 @@ command [:tickets,:ls] do |c|
       end
     end
   end
+end
+
+# Not sure about this
+def wrap(string,indent,cols)
+  cols_left = cols.to_i - indent
+  raise "Your terminal is too small for formatting" if (cols_left < 5)
+  return_me = ""
+  line = ""
+  prev_word = ""
+  string.split(/\s/).each do |word|
+    if line.length <= cols_left
+      line += " #{word}" if line != ""
+      line += "#{word}" if line == ""
+      prev_word = word
+    else
+      line.gsub!(/#{prev_word}$/,'')
+      return_me += line.underline + "\n"
+      indent.times { return_me +=  " " }
+      line = prev_word
+    end
+  end
+  if (line.length > cols_left)
+    line.gsub!(/#{prev_word}$/,'')
+    return_me += line.underline + "\n"
+    indent.times { return_me +=  " " }
+    line = prev_word
+  end
+  return_me += line.underline
+  return_me.gsub(/^\s/,'')
 end
 
 def bold(string)
