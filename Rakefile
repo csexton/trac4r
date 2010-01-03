@@ -15,15 +15,31 @@ rescue LoadError
   #puts "you may install the optional gem 'grancher'"
 end
 
+begin
+  require 'jeweler'
+  Jeweler::Tasks.new do |s|
+    s.name = "trac4r"
+    s.executables = "trac"
+    s.summary = 'Ruby Client Library for Trac'
+    s.email = "davidcopeland@naildrivin5.com"
+    s.description = 'Basic ruby client library and command line interface for accessing Trac instances via its XML RPC API'
+    s.authors = ['Niklas Cathro','David Copeland']
+    s.add_dependency('rainbow', '>= 1.0.4')
+    s.add_dependency('gli', '>= 1.1.0')
+    s.has_rdoc = true
+    s.extra_rdoc_files = ['README.rdoc']
+    s.rdoc_options << '--title' << 'trac4r Trac Ruby Client' << '--main' << 'README.rdoc' << '-ri'
+    s.require_paths << 'lib'
+  end
+  Jeweler::GemcutterTasks.new
+rescue LoadError
+  puts "Jeweler, or one of its dependencies, is not available. Install it with: sudo gem install jeweler"
+end
+
 Rake::RDocTask.new do |rd|
   rd.main = "README.rdoc"
   rd.rdoc_files.include("README.rdoc","lib/**/*.rb","bin/**/*")
   rd.title = 'Ruby interface to Trac'
-end
-
-spec = eval(File.read('trac4r.gemspec'))
-
-Rake::GemPackageTask.new(spec) do |pkg|
 end
 
 task :default => :test
