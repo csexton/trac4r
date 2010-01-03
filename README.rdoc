@@ -45,6 +45,8 @@ a more Rubyesque syntax:
     # This is a bit wierd, the "!" in the first element means "none of these values"
     not_closed_nor_testing = trac.tickets.query(:status => ["!closed","test"])
 
+:include:trac.rdoc
+
 == More Info
 
 * {RDoc}[http://davetron5000.github.com/trac4r]
