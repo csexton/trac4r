@@ -160,7 +160,7 @@ command [:tickets,:ls] do |c|
         end
         printf_string.gsub!(/ - $/,'')
         if columns.include? 'summary'
-          args << wrap(ticket.summary,padding+1,global_options[:cols])
+          args << do_wrap(ticket.summary,padding+1,global_options[:cols])
           printf_string += " - %s"
         end
         printf("#{printf_string}\n",*args)
@@ -181,7 +181,7 @@ command [:tickets,:ls] do |c|
 end
 
 # Not sure about this
-def wrap(string,indent,cols)
+def do_wrap(string,indent,cols)
   cols_left = cols.to_i - indent
   raise "Your terminal is too small for formatting" if (cols_left < 5)
   return_me = ""
@@ -281,6 +281,7 @@ post do |global,command,options,args|
 end
 
 on_error do |exception|
+  raise exception
   # Error logic here
   # return false to skip default error handling
   true
