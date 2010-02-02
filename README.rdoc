@@ -9,6 +9,8 @@ For more information on the Trac XML-RPC see the {plugin's page on trac-hacks.co
 
 Thanks to the original author, Niklas Cathor, who has done most of the work.
 
+<i>Note that I (David Copeland) will probably not be making more changes to this, as my main reason for picking this up was that I am using Trac where I work.  We are moving away from Trac, so I have less need to do anything with this library.  If someone is interested in claiming ownership, specifically owning the gem on Gemcutter, just let me know and I'll hand it over.</i>
+
 == Install
 
     # Only if you haven't set up gemcutter yet
