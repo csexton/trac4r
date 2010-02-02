@@ -1,8 +1,9 @@
 require 'rake/clean'
-require 'hanna/rdoctask'
+require 'rake/rdoctask'
 require 'rubygems'
 require 'rake/gempackagetask'
 require 'grancher'
+require 'sdoc'
 
 begin
   require 'grancher/task'
@@ -42,6 +43,8 @@ CLOBBER.include('trac.rdoc')
 Rake::RDocTask.new(:generate_rdoc) do |rd|
   rd.main = "README.rdoc"
   rd.rdoc_files.include("README.rdoc","lib/**/*.rb","bin/**/*")
+  rd.options << '--fmt' << 'shtml'
+  rd.template = 'direct'
   rd.title = 'Ruby interface to Trac'
 end
 
