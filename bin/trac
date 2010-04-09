@@ -57,7 +57,7 @@ end
 desc 'Go to the new ticket web interface'
 long_desc 'Navigates your browser to the web interface, initialized with the values you provide, but does not actually create the ticket'
 arg_name 'summary for the ticket'
-command [:newticket] do |c|
+command [:newticket,:nt] do |c|
   c.desc 'component'
   c.flag [:c,:component]
 
@@ -67,11 +67,19 @@ command [:newticket] do |c|
   c.desc 'priority'
   c.flag [:p,:priority]
 
+  c.desc 'milestone'
+  c.flag [:m,:milestone]
+
+  c.desc 'keywords'
+  c.flag [:k,:keywords]
+
   c.action do |global_options,options,args|
     query_params = {}
     query_params['priority'] = options[:p] if options[:p]
     query_params['component'] = options[:c] if options[:c]
     query_params['type'] = options[:t] if options[:t]
+    query_params['milestone'] = options[:m] if options[:m]
+    query_params['keywords'] = options[:k] if options[:k]
     query_params['summary'] = args.join(' ')
     query_string = ''
     query_params.each do |key,value|
