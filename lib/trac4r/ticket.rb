@@ -43,7 +43,7 @@ module Trac
     def method_missing(sym,*args)
       method = sym.to_s
       method = method[0..-2] if method =~ /!$/
-      if args.size == 0 && instance_variables.include?("@" + sym.to_s)
+      if args.size == 0 && instance_variables.include?("@#{method}".to_sym)
         instance_eval("@" + sym.to_s)
       elsif method != sym.to_s
         nil
