@@ -1,5 +1,4 @@
-trac4r: Ruby wrapper for the Trac XML-RPC API
-=============================================
+= trac4r: Ruby wrapper for the Trac XML-RPC API
 
 Author::   Niklas Cathor
 Author::   David Copeland
