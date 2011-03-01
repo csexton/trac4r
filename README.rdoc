@@ -31,6 +31,23 @@ This wraps the Trac XML-RPC plugin.
     trac.tickets.list # get all tickets
     trac.tickets.get 2334 # Get ticket #2334
 
+Receive one single ticket
+
+    ticket = trac.tickets.get 9
+    ticket.summary #=> 'foo'
+    ticket.description #=> 'bar'
+
+Scope the ticket
+
+    trac.tickets.list :include_closed => false
+
+Create a new ticket
+
+    trac.tickets.create "summary", "description", :type => 'defect', :version => '1.0', :milestone => 'bug free' #=> 10
+
+summary and description are required, the rest is optional. It can be one of the following: :severity, :milestone, :status, :type, :priority, :version, :reporter, :owner, :cc, :keywords
+
+
 === Tickets
 
 Trac's backbone is tickets.  The Tickets class contains many useful methods, but can also run arbitrary queries against Trac using
