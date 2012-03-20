@@ -36,8 +36,8 @@ module Trac
     def list options={ }
       include_closed = true
       include_closed = options[:include_closed] if !options[:include_closed].nil?
-      tickets = query(:status => "!closed")
-      tickets += query(:status => "closed") if include_closed
+      tickets = query(:status => "!closed", :max => 0)
+      tickets += query(:status => "closed", :max => 0) if include_closed
       return tickets
     end
 
@@ -52,7 +52,7 @@ module Trac
 
     # like `list', but only gets closed tickets
     def list_closed
-      query(:status => "closed")
+      query(:status => "closed", :max => 0)
     end
   
     # returns all tickets (not just the ids) in a hash
